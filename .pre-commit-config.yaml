@@ -14,10 +14,17 @@ repos:
           - --args=--exit-code=1
           - --args=--severity=HIGH,CRITICAL
           - --args=--skip-dirs=**/.terraform
-      - id: terraform_docs
-        files: ^modules/
+
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: v0.24.0
+    hooks:
+      - id: terraform-docs-go
+        name: terraform-docs
         args:
-          - --args=--config=.terraform-docs.yml
+          - --config=.terraform-docs.yml
+          - --output-check
+          - modules/s3_bucket
+        always_run: true
 
   - repo: local
     hooks:

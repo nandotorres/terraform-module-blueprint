@@ -6,7 +6,7 @@ S3 bucket building block for an organization stack. Uses [terraform-aws-modules/
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.42.0 |
 
@@ -17,7 +17,7 @@ No providers.
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_bucket"></a> [bucket](#module\_bucket) | terraform-aws-modules/s3-bucket/aws | 5.16.2 |
 
 ## Resources
@@ -27,7 +27,7 @@ No resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | Globally unique bucket name. Lowercase letters, numbers, dots, and hyphens, 3-63 characters, starting and ending with a letter or number. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to the bucket. Environment and Owner are required and must be non-empty. The module sets ManagedBy and Module itself. | `map(string)` | n/a | yes |
 | <a name="input_expiration_days"></a> [expiration\_days](#input\_expiration\_days) | Expire current object versions after this many days. Null omits the lifecycle configuration. | `number` | `null` | no |
@@ -36,7 +36,7 @@ No resources.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_bucket_arn"></a> [bucket\_arn](#output\_bucket\_arn) | ARN of the bucket. |
 | <a name="output_bucket_id"></a> [bucket\_id](#output\_bucket\_id) | Name of the bucket. |
 | <a name="output_bucket_regional_domain_name"></a> [bucket\_regional\_domain\_name](#output\_bucket\_regional\_domain\_name) | Regional domain name of the bucket. |
