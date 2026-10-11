@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.109.2
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+          - --hook-config=--delegate-chdir
+      - id: terraform_trivy
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/trivy.yaml
+          - --args=--exit-code=1
+          - --args=--severity=HIGH,CRITICAL
+          - --args=--skip-dirs=**/.terraform
+      - id: terraform_docs
+        files: ^modules/
+        args:
+          - --args=--config=.terraform-docs.yml
+
+  - repo: local
+    hooks:
+      - id: conftest-verify
+        name: Conftest policy tests
+        entry: conftest verify --policy policies
+        language: system
+        pass_filenames: false
+        always_run: true
