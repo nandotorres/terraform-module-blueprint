@@ -1,0 +1,92 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.61.0
+
+      - name: Install Trivy, Conftest, and terraform-docs
+        run: |
+          set -euo pipefail
+          install_tar() {
+            local url="$1"
+            local bin="$2"
+            curl -sSLo tool.tar.gz "$url"
+            tar -xzf tool.tar.gz
+            sudo mv "$bin" /usr/local/bin/
+            rm -f tool.tar.gz
+          }
+          install_tar https://github.com/aquasecurity/trivy/releases/download/v0.75.0/trivy_0.75.0_Linux-64bit.tar.gz trivy
+          install_tar https://github.com/open-policy-agent/conftest/releases/download/v0.71.1/conftest_0.71.1_Linux_x86_64.tar.gz conftest
+          install_tar https://github.com/terraform-docs/terraform-docs/releases/download/v0.24.0/terraform-docs-v0.24.0-linux-amd64.tar.gz terraform-docs
+
+      - name: Check
+        run: make check
+
+  e2e:
+    name: terratest localstack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      localstack:
+        image: localstack/localstack:4.14.0
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: s3,sts
+          AWS_DEFAULT_REGION: us-east-1
+        options: >-
+          --health-cmd "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:4566/_localstack/health')\""
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+          --health-start-period 10s
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+
+      - name: Install Conftest
+        run: |
+          set -euo pipefail
+          curl -sSLo conftest.tar.gz https://github.com/open-policy-agent/conftest/releases/download/v0.71.1/conftest_0.71.1_Linux_x86_64.tar.gz
+          tar -xzf conftest.tar.gz
+          sudo mv conftest /usr/local/bin/
+          rm -f conftest.tar.gz
+
+      - name: Policy plan
+        run: make policy-plan
+
+      - name: Terratest
+        working-directory: tests/e2e
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_EC2_METADATA_DISABLED: "true"
+        run: go test -count=1 -timeout 20m -v ./...
