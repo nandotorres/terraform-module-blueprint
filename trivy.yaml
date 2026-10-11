@@ -1,0 +1,14 @@
+severity:
+  - HIGH
+  - CRITICAL
+
+scan:
+  scanners:
+    - misconfig
+    - secret
+  skip-dirs:
+    - "**/.terraform"
+
+misconfiguration:
+  terraform:
+    exclude-downloaded-modules: true
