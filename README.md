@@ -26,11 +26,11 @@ It implements:
 Install [Nix](https://nixos.org/download/). `make test` needs Docker running (Docker Desktop or Colima).
 
 ```sh
-nix develop
+nix develop --extra-experimental-features flakes --extra-experimental-features nix-command
 make test
 ```
 
-`make check` does not start Docker. `make simulate` sends a broken file through fmt, tflint, trivy, `terraform test`, and conftest, and expects each one to fail. If Nix says flakes are experimental, add `--extra-experimental-features 'nix-command flakes'`.
+`make check` does not start Docker. `make simulate` sends a broken file through fmt, tflint, trivy, `terraform test`, and conftest, and expects each one to fail.
 
 ## Tools
 
