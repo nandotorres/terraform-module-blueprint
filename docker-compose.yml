@@ -1,0 +1,22 @@
+# 4.14.0 is the last Community image that starts without LOCALSTACK_AUTH_TOKEN.
+services:
+  localstack:
+    image: localstack/localstack:4.14.0
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,sts
+      AWS_DEFAULT_REGION: us-east-1
+      DEBUG: "0"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:4566/_localstack/health')",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
